@@ -5,10 +5,12 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
+	prometheus.MustRegister(pingMetric)
 	http.Handle("/metrics", promhttp.Handler())
 
 	log.Info("Beginning to serve on port :8080")
