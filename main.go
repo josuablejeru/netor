@@ -1,22 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
 
-	"github.com/showwin/speedtest-go/speedtest"
+	log "github.com/sirupsen/logrus"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
-	user, _ := speedtest.FetchUserInfo()
+	http.Handle("/metrics", promhttp.Handler())
 
-	serverList, _ := speedtest.FetchServerList(user)
-	targets, _ := serverList.FindServer([]int{})
-
-	for _, s := range targets {
-		s.PingTest()
-		s.DownloadTest(true)
-		s.UploadTest(true)
-
-		fmt.Printf("Latency: %s, Download: %f, Upload: %f\n", s.Latency, s.DLSpeed, s.ULSpeed)
-	}
+	log.Info("Beginning to serve on port :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
