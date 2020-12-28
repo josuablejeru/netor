@@ -13,4 +13,13 @@ services:
     ports:
       - 9090:9090
     networks:
-      - netor 
+      - netor
+
+  netor:
+    container_name: netor
+    build: .
+    image: josuablejeru/netor
+    ports:
+      - 8080:8080
+    networks:
+      - netor
