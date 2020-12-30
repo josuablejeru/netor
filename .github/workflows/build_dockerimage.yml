@@ -34,5 +34,5 @@ jobs:
           push: true
           # GITHUB_REPOSITORY: The owner and repository name. For example, octocat/Hello-World
           tags: |
-            $GITHUB_REPOSITORY:latest
-            $GITHUB_REPOSITORY:1.0.0
+            josuablejeru/netor:latest
+            josuablejeru/netor:1.0.0
