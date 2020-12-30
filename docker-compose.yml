@@ -30,7 +30,7 @@ services:
   netor:
     container_name: netor
     build: .
-    image: josuablejeru/netor
+    image: josuablejeru/netor:latest
     ports:
       - 8080:8080
     networks:
