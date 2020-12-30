@@ -51,24 +51,48 @@ func NewSpeedTest() *SpeedTest {
 				Type: prometheus.GaugeValue,
 				Desc: prometheus.NewDesc(
 					prometheus.BuildFQName(namespace, subsystem, "latency"),
-					"The Latency (PING) of the network request", nil, nil,
+					"The Latency (PING) of the network request to the server", nil, nil,
 				),
 				Value: func(server speedtest.Server) float64 {
 					return float64(server.Latency)
+				},
+			},
+			{
+				Type: prometheus.GaugeValue,
+				Desc: prometheus.NewDesc(
+					prometheus.BuildFQName(namespace, subsystem, "download"),
+					"The Downloadspeed calculated by the server", nil, nil,
+				),
+				Value: func(server speedtest.Server) float64 {
+					return float64(server.DLSpeed)
+				},
+			},
+			{
+				Type: prometheus.GaugeValue,
+				Desc: prometheus.NewDesc(
+					prometheus.BuildFQName(namespace, subsystem, "upload"),
+					"The Uploadspeed calculated by the server", nil, nil,
+				),
+				Value: func(server speedtest.Server) float64 {
+					return float64(server.ULSpeed)
 				},
 			},
 		},
 	}
 }
 
-func (s *SpeedTest) runAndFetchSpeedtest() speedtest.Server {
+func (s *SpeedTest) runAndFetchSpeedtestResult() speedtest.Server {
 	// Hacky dummy data gen. :)
 	min := -13.53
 	max := 14.76
-	res := int64(min + rand.Float64()*(max-min))
+	res1 := int64(min + rand.Float64()*(max-min))
+	res2 := min + rand.Float64()*(max-min)
+	res3 := min + rand.Float64()*(max-min)
 
 	return speedtest.Server{
-		Latency: time.Duration(res),
+		Latency: time.Duration(res1),
+		DLSpeed: res2,
+		ULSpeed: res3,
 	}
 }
 
@@ -95,13 +119,13 @@ func (s *SpeedTest) Collect(ch chan<- prometheus.Metric) {
 		s.mutex.Unlock()
 	}()
 
-	testResult := s.runAndFetchSpeedtest()
+	dummyServerResult := s.runAndFetchSpeedtestResult()
 
 	for _, metric := range s.metrics {
 		ch <- prometheus.MustNewConstMetric(
 			metric.Desc,
 			metric.Type,
-			metric.Value(testResult),
+			metric.Value(dummyServerResult),
 		)
 	}
 
