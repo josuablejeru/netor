@@ -3,10 +3,23 @@ networks:
   netor:
 
 services:
+  grafana:
+    image: grafana/grafana:7.2.0
+    ports:
+      - 3000:3000
+    volumes:
+      - ./config/grafana/datasources:/etc/grafana/datasources
+      # - ./config/grafana.ini:/etc/grafana/grafana.ini
+      # - ./config/dashboards:/var/lib/grafana/dashboards
+      # - ./config/plugins:/var/lib/grafana/plugins
+      # - grafana_data:/var/lib/grafana
+    networks:
+      - netor
+    
   prometheus:
     image: prom/prometheus:v2.21.0
     volumes:
-      - ./prometheus/:/etc/prometheus/
+      - ./config/prometheus:/etc/prometheus/
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"

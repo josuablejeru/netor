@@ -1,0 +1,7 @@
+# https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://netor:9090
