@@ -1,6 +1,8 @@
 version: "3.8"
 networks:
   netor:
+volumes:
+  grafana_data:
 
 services:
   grafana:
@@ -8,11 +10,8 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./config/grafana/datasources:/etc/grafana/datasources
-      # - ./config/grafana.ini:/etc/grafana/grafana.ini
-      # - ./config/dashboards:/var/lib/grafana/dashboards
-      # - ./config/plugins:/var/lib/grafana/plugins
-      # - grafana_data:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning/:/etc/grafana/provisioning/
     networks:
       - netor
     
