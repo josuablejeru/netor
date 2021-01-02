@@ -1,18 +1,24 @@
 package collector
 
 import (
-	"math/rand"
 	"sync"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/showwin/speedtest-go/speedtest"
+)
+
+var (
+	targets speedtest.Servers
 )
 
 const (
 	namespace = "netor"
 	subsystem = "speed"
 )
+
+func init() {
+	targets = PrepareSession()
+}
 
 // SpeedTest type defines the collector struct
 type SpeedTest struct {
@@ -27,7 +33,7 @@ type SpeedTestMetric struct {
 	Desc *prometheus.Desc
 	Type prometheus.ValueType
 
-	Value func(server speedtest.Server) float64
+	Value func(server *speedtest.Server) float64
 }
 
 // NewSpeedTest returns a new Collector exposing Speedtest stats
@@ -53,7 +59,7 @@ func NewSpeedTest() *SpeedTest {
 					prometheus.BuildFQName(namespace, subsystem, "latency"),
 					"The Latency (PING) of the network request to the server", nil, nil,
 				),
-				Value: func(server speedtest.Server) float64 {
+				Value: func(server *speedtest.Server) float64 {
 					return float64(server.Latency)
 				},
 			},
@@ -63,7 +69,7 @@ func NewSpeedTest() *SpeedTest {
 					prometheus.BuildFQName(namespace, subsystem, "download"),
 					"The Downloadspeed calculated by the server", nil, nil,
 				),
-				Value: func(server speedtest.Server) float64 {
+				Value: func(server *speedtest.Server) float64 {
 					return float64(server.DLSpeed)
 				},
 			},
@@ -73,7 +79,7 @@ func NewSpeedTest() *SpeedTest {
 					prometheus.BuildFQName(namespace, subsystem, "upload"),
 					"The Uploadspeed calculated by the server", nil, nil,
 				),
-				Value: func(server speedtest.Server) float64 {
+				Value: func(server *speedtest.Server) float64 {
 					return float64(server.ULSpeed)
 				},
 			},
@@ -81,19 +87,14 @@ func NewSpeedTest() *SpeedTest {
 	}
 }
 
-func (s *SpeedTest) runAndFetchSpeedtestResult() speedtest.Server {
-	// Hacky dummy data gen. :)
-	min := -13.53
-	max := 14.76
-	res1 := int64(min + rand.Float64()*(max-min))
-	res2 := min + rand.Float64()*(max-min)
-	res3 := min + rand.Float64()*(max-min)
-
-	return speedtest.Server{
-		Latency: time.Duration(res1),
-		DLSpeed: res2,
-		ULSpeed: res3,
+func (s *SpeedTest) runAndFetchSpeedtestResult(targets speedtest.Servers) *speedtest.Server {
+	for _, s := range targets {
+		s.PingTest()
+		s.DownloadTest(true)
+		s.UploadTest(true)
+		return s
 	}
+	return nil
 }
 
 // Describe sends the Desc to Metrix regristry.
@@ -119,13 +120,13 @@ func (s *SpeedTest) Collect(ch chan<- prometheus.Metric) {
 		s.mutex.Unlock()
 	}()
 
-	dummyServerResult := s.runAndFetchSpeedtestResult()
+	serverResult := s.runAndFetchSpeedtestResult(targets)
 
 	for _, metric := range s.metrics {
 		ch <- prometheus.MustNewConstMetric(
 			metric.Desc,
 			metric.Type,
-			metric.Value(dummyServerResult),
+			metric.Value(serverResult),
 		)
 	}
 
