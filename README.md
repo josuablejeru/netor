@@ -2,20 +2,44 @@
 
 ## 📖 Overwiew
 
-NETOR is the Inter**NE**t Moni**TOR**. It shows you the current UP and DOWN speed of your Internet connection.
+NETOR is the Inter**NE**t Moni**TOR**. It shows you the current speed of your local network.
 
-## 🚀 Run Exporter
+## 🚀 Getting Started
 
-The metrix will be available on the default prometheus Path `/metrics`
+### ⚙️ Prerequisites and installation
 
-```bash
-docker run --rm -p 8080:8080 josuablejeru/netor:latest
-```
+> **_NOTE:_** Make shure to have Docker and Docker-Compose installed on you Machine.
 
-If you want to test it localy use docker-compose. This will provide you Grafana on localhost with the port `:3000`.
-
-Prometheus (on `:9090`) and netor (on `:8080`) will be allready setup
+Pull the Image from the official Docker Regristry.
 
 ```bash
-docker-compose up
+$ docker pull josuablejeru/netor:latest
 ```
+
+### Usage | standalone
+
+Run and bind the port `:8080`.
+
+```bash
+$ docker run --rm -p 8080:8080 josuablejeru/netor:latest
+```
+
+The metrix will be available on the default Prometheus path `/metrics`.
+
+### Usage | with Grafana and Prometheus
+
+Run Netor with prometheus and Grafana localy with docker compose in the Repo root.
+
+```bash
+$ docker-compose up
+```
+
+Prometheus and Grafana will be available on port `:9090` and `:3000`.
+
+## 📝 License
+
+Distributed under the MIT License. See LICENSE for more information.
+
+## Acknowledgements
+
+- [speedtest-go](https://github.com/showwin/speedtest-go)
