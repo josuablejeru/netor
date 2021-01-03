@@ -9,12 +9,12 @@ import (
 func PrepareSession() (targets speedtest.Servers) {
 	user, err := speedtest.FetchUserInfo()
 	if err != nil {
-		log.Fatal("Could not fetch required user information")
+		log.Fatal(err)
 	}
 
 	serverList, err := speedtest.FetchServerList(user)
 	if err != nil {
-		log.Fatal("could not fetch server list")
+		log.Fatal(err)
 	}
 
 	targets, _ = serverList.FindServer([]int{})
