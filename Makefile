@@ -9,5 +9,8 @@ build:  ## Build and tag the docker image
 clean:  ## Delete the local docker image
 	docker image rm $(IMAGE_TAG)
 
+upgrade:  ## Upgrade all Go packages in $GOPATH
+	go get -u all
+
 help:  ## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
