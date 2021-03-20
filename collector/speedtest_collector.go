@@ -83,9 +83,7 @@ func NewSpeedTest() *SpeedTest {
 
 func (s *SpeedTest) runAndFetchSpeedtestResult() *speedtest.Server {
 	for _, t := range s.targets {
-		t.PingTest()
-		t.DownloadTest(true)
-		t.UploadTest(true)
+		go StartSpeedtesting(t)
 		return t
 	}
 	return nil

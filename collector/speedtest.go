@@ -21,3 +21,12 @@ func GetTargets() (targets speedtest.Servers) {
 
 	return targets
 }
+
+// StartSpeedtesting retuns
+func StartSpeedtesting(target *speedtest.Server) {
+	go func() {
+		target.PingTest()
+		target.DownloadTest(false)
+		target.UploadTest(false)
+	}()
+}
