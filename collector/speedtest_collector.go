@@ -7,23 +7,16 @@ import (
 	"github.com/showwin/speedtest-go/speedtest"
 )
 
-var (
-	targets speedtest.Servers
-)
-
 const (
 	namespace = "netor"
 	subsystem = "speed"
 )
 
-func init() {
-	targets = PrepareSession()
-}
-
 // SpeedTest type defines the collector struct
 type SpeedTest struct {
 	up                              prometheus.Gauge
 	totalScrapes, jsonParseFailures prometheus.Counter
+	targets                         speedtest.Servers
 	metrics                         []*SpeedTestMetric
 	mutex                           sync.RWMutex
 }
@@ -38,6 +31,7 @@ type SpeedTestMetric struct {
 
 // NewSpeedTest returns a new Collector exposing Speedtest stats
 func NewSpeedTest() *SpeedTest {
+	targets := GetTargets()
 	return &SpeedTest{
 		up: prometheus.NewGauge(prometheus.GaugeOpts{
 			Name: prometheus.BuildFQName(namespace, subsystem, "up"),
@@ -51,7 +45,7 @@ func NewSpeedTest() *SpeedTest {
 			Name: prometheus.BuildFQName(namespace, subsystem, "json_parse_failures"),
 			Help: "Number of errors while parsing JSON.",
 		}),
-
+		targets: targets,
 		metrics: []*SpeedTestMetric{
 			{
 				Type: prometheus.GaugeValue,
@@ -87,12 +81,10 @@ func NewSpeedTest() *SpeedTest {
 	}
 }
 
-func (s *SpeedTest) runAndFetchSpeedtestResult(targets speedtest.Servers) *speedtest.Server {
-	for _, s := range targets {
-		s.PingTest()
-		s.DownloadTest(true)
-		s.UploadTest(true)
-		return s
+func (s *SpeedTest) runAndFetchSpeedtestResult() *speedtest.Server {
+	for _, t := range s.targets {
+		go StartSpeedtesting(t)
+		return t
 	}
 	return nil
 }
@@ -113,6 +105,7 @@ func (s *SpeedTest) Describe(ch chan<- *prometheus.Desc) {
 func (s *SpeedTest) Collect(ch chan<- prometheus.Metric) {
 	s.mutex.Lock()
 	s.totalScrapes.Inc()
+
 	defer func() {
 		ch <- s.up
 		ch <- s.totalScrapes
@@ -120,7 +113,7 @@ func (s *SpeedTest) Collect(ch chan<- prometheus.Metric) {
 		s.mutex.Unlock()
 	}()
 
-	serverResult := s.runAndFetchSpeedtestResult(targets)
+	serverResult := s.runAndFetchSpeedtestResult()
 
 	for _, metric := range s.metrics {
 		ch <- prometheus.MustNewConstMetric(
@@ -129,5 +122,4 @@ func (s *SpeedTest) Collect(ch chan<- prometheus.Metric) {
 			metric.Value(serverResult),
 		)
 	}
-
 }
