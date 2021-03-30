@@ -1,14 +1,17 @@
 # 📈 NETOR
 
+![](https://upload.wikimedia.org/wikipedia/commons/3/38/Prometheus_software_logo.svg)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 ## 📖 Overwiew
 
-NETOR is the Inter**NE**t Moni**TOR**. It shows you the current speed of your local network.
+NETOR (Inter**NE**t Moni**TOR**). Is a Prometheus exporter to monitor your local network speed.
 
 ## 🚀 Getting Started
 
 ### ⚙️ Prerequisites and installation
 
-> **_NOTE:_** Make shure to have Docker and Docker-Compose installed on you Machine.
+> **_NOTE:_** Make sure to have Docker and Docker-Compose installed on you Machine.
 
 Pull the Image from the official Docker Registry.
 
