@@ -30,7 +30,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/386
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/386
           push: true
           # GITHUB_REPOSITORY: The owner and repository name. For example, octocat/Hello-World
           tags: |
